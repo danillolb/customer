@@ -1,0 +1,75 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.5'
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+springBoot {
+	mainClass = 'com.danillo.customer.CustomerApplication'
+}
+
+group = 'com.danillo'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	integTest {
+		java {
+			srcDirs = ['src/integTest/java']
+		}
+		resources {
+			srcDirs = ['src/integTest/resources']
+		}
+		compileClasspath += sourceSets.main.output + configurations.testCompileClasspath
+		runtimeClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+	}
+}
+
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:3.0.5'
+	implementation 'org.springframework.cloud:spring-cloud-dependencies:2023.0.2'
+	compileOnly 'org.projectlombok:lombok:1.18.30'
+	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+	//db
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'org.postgresql:postgresql:42.7.2'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	testImplementation 'org.testcontainers:testcontainers:1.19.0'
+	testImplementation 'org.testcontainers:junit-jupiter:1.19.0'
+	testImplementation 'org.testcontainers:postgresql:1.19.0'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.mockito:mockito-core'
+}
+
+configurations {
+	integTestImplementation.extendsFrom testImplementation
+	integTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+task integrationTest(type: Test) {
+	testClassesDirs = sourceSets.integTest.output.classesDirs
+	classpath = sourceSets.integTest.runtimeClasspath
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
